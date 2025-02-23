@@ -23,7 +23,7 @@ class Granssnitt {
     private JLabel labelTitle, labelDescription, labelYear, labelAuthor, labelCategory, labelBookId, labelCatToChoose;
     private JTextField txtTitle, txtDescription, txtYear, txtAuthor, txtCategory, txtBookId;
     private static JTextArea txtdisplay;
-    private JButton buttonAllBooks, buttonSpecificBook, buttonCategory, buttonNewBook, buttonDelete, buttonExit;
+    private JButton buttonAllBooks, buttonSpecificBook, buttonCategory, buttonNewBook, buttonDelete, buttonExit, buttonByID;
     private JScrollPane scroll;
     private Lyssnare lyssna;
 
@@ -64,21 +64,20 @@ class Granssnitt {
         panel1.add(txtDescription);
 
         labelCategory = new JLabel("Category:");
-        labelCatToChoose=new JLabel("IT, Math, Physics or Economy");
+        labelCatToChoose = new JLabel("IT, Math, Physics or Economy");
         txtCategory = new JTextField(10);
         labelCategory.setBounds(50, 150, 100, 25);
-        labelCatToChoose.setBounds(50, 150, 200,60);
+        labelCatToChoose.setBounds(50, 150, 200, 60);
         txtCategory.setBounds(130, 150, 180, 25);
         panel1.add(labelCategory);
         panel1.add(labelCatToChoose);
         panel1.add(txtCategory);
 
 
-
         labelBookId = new JLabel("Enter book ID:");
         txtBookId = new JTextField(100);
-        labelBookId.setBounds(335, 190, 150, 25);
-        txtBookId.setBounds(430, 190, 120, 25);
+        labelBookId.setBounds(335, 220, 150, 25);
+        txtBookId.setBounds(430, 220, 120, 25);
         panel1.add(labelBookId);
         panel1.add(txtBookId);
 
@@ -102,6 +101,10 @@ class Granssnitt {
         buttonDelete.setBounds(325, 150, 230, 25);
         panel1.add(buttonDelete);
 
+        buttonByID = new JButton("Retrieve a book by id");
+        buttonByID.setBounds(325, 180, 230, 25);
+        panel1.add(buttonByID);
+
         buttonExit = new JButton("Exit");
         buttonExit.setBounds(350, 660, 210, 25);
         panel1.add(buttonExit);
@@ -122,6 +125,7 @@ class Granssnitt {
         buttonCategory.addActionListener(lyssna);
         buttonNewBook.addActionListener(lyssna);
         buttonDelete.addActionListener(lyssna);
+        buttonByID.addActionListener(lyssna);
         buttonExit.addActionListener(lyssna);
 
         panel1.setLayout(new BorderLayout());
@@ -143,7 +147,7 @@ class Granssnitt {
         String title = txtTitle.getText();
         String author = txtAuthor.getText();
         String description = txtDescription.getText();
-        String category=txtCategory.getText();
+        String category = txtCategory.getText();
         String yearText = txtYear.getText();
 
         if (title.isEmpty() || author.isEmpty()) {
@@ -156,7 +160,7 @@ class Granssnitt {
             return;
         }
 
-        if (category.isEmpty() || !isValidCategory(category)){
+        if (category.isEmpty() || !isValidCategory(category)) {
             txtdisplay.append("You need to state one of the following categories: IT, Math, Physics or Economy.\n");
             return;
         }
@@ -215,15 +219,16 @@ class Granssnitt {
             e.printStackTrace();
         } finally {
             //Clear the text fields
-        txtTitle.setText("");
-        txtAuthor.setText("");
-        txtYear.setText("");
-        txtDescription.setText("");
-        txtCategory.setText("");
+            txtTitle.setText("");
+            txtAuthor.setText("");
+            txtYear.setText("");
+            txtDescription.setText("");
+            txtCategory.setText("");
+
+        }
 
     }
 
-}
     //Method to check if the category is valid
     private boolean isValidCategory(String category) {
         try {
@@ -247,8 +252,9 @@ class Granssnitt {
             return false;
         }
     }
+
     public void newMessage(String s) {
-        txtdisplay.append(s+"\n");
+        txtdisplay.append(s + "\n");
     }
 
     //Method to retrieve and display all books
@@ -261,7 +267,7 @@ class Granssnitt {
             // URL of the endpoint to fetch all books
             URL url = new URL("http://localhost:8080/books");
 
-           // Open a connection to the URL and set the request method to GET
+            // Open a connection to the URL and set the request method to GET
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
@@ -275,7 +281,8 @@ class Granssnitt {
             } else if (responseCode == HttpURLConnection.HTTP_OK) {//HTTP Status-Code 200: OK.
 
                 // Deserialize the JSON response into a List of Maps
-                List<Map<String, Object>> bookList = objectMapper.readValue(url, new TypeReference<List<Map<String, Object>>>() {});
+                List<Map<String, Object>> bookList = objectMapper.readValue(url, new TypeReference<List<Map<String, Object>>>() {
+                });
 
                 // Iterate through the list and retrieve book details
                 for (Map<String, Object> bookMap : bookList) {
@@ -324,19 +331,19 @@ class Granssnitt {
 
                 // Check if the book list is not empty and iterate through the list and retrieve book details
                 if (!bookList.isEmpty()) {
-                for (Map<String, Object> bookMap : bookList) {
-                    Long id = ((Number) bookMap.get("id")).longValue();
-                    String bookTitle = (String) bookMap.get("title");
-                    String publishedYear = (String) bookMap.get("published_year");
-                    String author = (String) bookMap.get("author");
-                    String description = (String) bookMap.get("description");
-                    String category = (String) bookMap.get("category");
+                    for (Map<String, Object> bookMap : bookList) {
+                        Long id = ((Number) bookMap.get("id")).longValue();
+                        String bookTitle = (String) bookMap.get("title");
+                        String publishedYear = (String) bookMap.get("published_year");
+                        String author = (String) bookMap.get("author");
+                        String description = (String) bookMap.get("description");
+                        String category = (String) bookMap.get("category");
 
-                    //Append the book details to the text display
-                    txtdisplay.append("ID: " + id + ", Title: " + bookTitle + ", Published Year: " + publishedYear + ", Author: " + author + ", Description: " + description + ", Category: " + category + "\n");
+                        //Append the book details to the text display
+                        txtdisplay.append("ID: " + id + ", Title: " + bookTitle + ", Published Year: " + publishedYear + ", Author: " + author + ", Description: " + description + ", Category: " + category + "\n");
 
-                }
-                txtdisplay.append("------------------------\n");
+                    }
+                    txtdisplay.append("------------------------\n");
                 }
             } else if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {// HTTP Status-Code 404: Not Found
                 txtdisplay.append("No title provided or no book(s) found with the title:" + title + "\n");
@@ -352,7 +359,7 @@ class Granssnitt {
     }
 
 
-// Method to retrieve and display books by category
+    // Method to retrieve and display books by category
     public void getBooksByCategory() {
         // Create an object mapper instance for JSON processing
         ObjectMapper objectMapper = new ObjectMapper();
@@ -374,7 +381,8 @@ class Granssnitt {
             if (responseCode == HttpURLConnection.HTTP_OK) { // HTTP Status-Code 200: OK
 
                 // Deserialize the JSON response into a List of Maps
-                List<Map<String, Object>> bookList = objectMapper.readValue(connection.getInputStream(), new TypeReference<List<Map<String, Object>>>() {});
+                List<Map<String, Object>> bookList = objectMapper.readValue(connection.getInputStream(), new TypeReference<List<Map<String, Object>>>() {
+                });
 
                 // Check if the book list is not empty and iterate through the list and retrieve book details
                 if (!bookList.isEmpty()) {
@@ -413,10 +421,10 @@ class Granssnitt {
         ObjectMapper objectMapper = new ObjectMapper();
 
         // Retrieve the book ID from the input field
-        String bookID= txtBookId.getText();
+        String bookID = txtBookId.getText();
 
         // Check if the book ID is empty
-        if (bookID.isEmpty()){
+        if (bookID.isEmpty()) {
             txtdisplay.append("No book ID provided. Please enter a book ID.\n");
             txtdisplay.append("------------------------\n");
             return;
@@ -451,4 +459,67 @@ class Granssnitt {
         }
     }
 
+    //Method to find a book by ID
+    public void getBookByID() {
+        // Create an ObjectMapper instance for JSON processing
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // Retrieve the book ID from the input field
+        String bookID = txtBookId.getText();
+
+        // Check if the book ID is empty
+        if (bookID.isEmpty()) {
+            txtdisplay.append("No book ID provided. Please enter a book ID.\n");
+            txtdisplay.append("------------------------\n");
+            return;
+        }
+
+        // Convert the book ID to a Long
+        Long id = Long.parseLong(bookID);
+
+        try {
+            // URL of the endpoint to retrieve book by ID
+            URL url = new URL("http://localhost:8080/books/" + id);
+
+            // Open a connection to the URL and set the request method to GET
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            // Get the response code from the server
+            int responseCode = connection.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) { // HTTP Status-Code 200: OK
+
+                // Deserialize the JSON response into a Map
+                Map<String, Object> bookMap = objectMapper.readValue(connection.getInputStream(), new TypeReference<Map<String, Object>>() {});
+
+                // Check if the book map is not empty and retrieve book details
+                if (!bookMap.isEmpty()) {
+                    Long bookId = ((Number) bookMap.get("id")).longValue();
+                    String bookTitle = (String) bookMap.get("title");
+                    String publishedYear = (String) bookMap.get("published_year");
+                    String author = (String) bookMap.get("author");
+                    String description = (String) bookMap.get("description");
+                    String category = (String) bookMap.get("category");
+
+                    // Append the book details to the text display
+                    txtdisplay.append("ID: " + bookId + ", Title: " + bookTitle + ", Published Year: " + publishedYear + ", Author: " + author + ", Description: " + description + ", Category: " + category + "\n");
+                    txtdisplay.append("------------------------\n");
+                } else {
+                    txtdisplay.append("No book found with the ID: " + id + "\n");
+                    txtdisplay.append("------------------------\n");
+                }
+            } else if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) { // HTTP Status-Code 404: Not Found
+                txtdisplay.append("No or wrong id provided.\n");
+                txtdisplay.append("------------------------\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            txtdisplay.append("Error connecting to URL: " + e.getMessage() + "\n");
+            txtdisplay.append("------------------------\n");
+        } finally {
+            txtBookId.setText(""); // Clear the text field
+        }
+
+    }
 }

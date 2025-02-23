@@ -18,8 +18,10 @@ public class Lyssnare extends WindowAdapter implements ActionListener {
             grans.getBooksByCategory();
         }else  if (e.getActionCommand().equals("Retrieve all books")) {
             grans.getAllBooks();
-        }else if (e.getActionCommand().equals("Delete a book by id")){
+        }else if (e.getActionCommand().equals("Delete a book by id")) {
             grans.deleteBook();
+        } else if(e.getActionCommand().equals("Retrieve a book by id")){
+            grans.getBookByID();
         } else if (e.getActionCommand().equals("Exit")){
             System.exit(0);
         }
